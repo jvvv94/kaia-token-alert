@@ -7,9 +7,10 @@ from telegram import Bot
 ADDRESS = os.getenv("ADDRESS")
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
 TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
+KAIASCAN_API_KEY = os.getenv("KAIASCAN_API_KEY")
 
 # ✅ 감지 대상 API (KAIA Scan)
-TOKEN_API_URL = f"https://oapi.kaiascan.io/api/v1/txs?address={ADDRESS}&limit=10"
+TOKEN_API_URL = f"https://mainnet-oapi.kaiascan.io/api/v1/accounts/{ADDRESS}/token-transfers"
 
 # 🕓 주기 설정 (10분)
 CHECK_INTERVAL = 600  # 초
@@ -21,11 +22,13 @@ bot = Bot(token=TELEGRAM_TOKEN)
 seen_token_hashes = set()
 
 async def check_new_token_txs():
-    print("[INFO] Checking new token txs...")
     try:
-        res = requests.get(TOKEN_API_URL)
+        headers = {
+            "x-api-key": KAIASCAN_API_KEY
+        }
+        res = requests.get(TOKEN_API_URL, headers=headers)
         data = res.json()
-        txs = data.get("data", [])
+        txs = data.get("items", [])
 
         for tx in txs:
             tx_hash = tx.get("txHash")
