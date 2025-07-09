@@ -23,6 +23,8 @@ seen_token_hashes = set()
 
 async def check_new_token_txs():
     try:
+        print("[INFO] Checking new token txs...")
+        
         headers = {
             "x-api-key": KAIASCAN_API_KEY
         }
