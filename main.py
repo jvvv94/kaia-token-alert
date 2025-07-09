@@ -9,7 +9,7 @@ TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
 TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
 
 # ✅ 감지 대상 API (KAIA Scan)
-TOKEN_API_URL = f"https://api.kaiascan.io/api/v1/txs?address={ADDRESS}&limit=10"
+TOKEN_API_URL = f"https://oapi.kaiascan.io/api/v1/txs?address={ADDRESS}&limit=10"
 
 # 🕓 주기 설정 (10분)
 CHECK_INTERVAL = 600  # 초
