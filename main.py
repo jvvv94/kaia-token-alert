@@ -21,16 +21,25 @@ bot = Bot(token=TELEGRAM_TOKEN)
 # ✅ 이미 본 트랜잭션 해시 저장용
 seen_token_hashes = set()
 
+# ✅ 최초 메시지 전송 여부
+startup_notified = False
+
 async def check_new_token_txs():
+    global startup_notified
     try:
         print("[INFO] Checking new token txs...")
-        
+
         headers = {
             "x-api-key": KAIASCAN_API_KEY
         }
         res = requests.get(TOKEN_API_URL, headers=headers)
         data = res.json()
         txs = data.get("items", [])
+
+        # ✅ 최초 실행 시, 감시 시작 메시지 전송
+        if not startup_notified:
+            await bot.send_message(chat_id=TELEGRAM_CHAT_ID, text="🔔 Monitoring started for token transfers.")
+            startup_notified = True
 
         for tx in txs:
             tx_hash = tx.get("txHash")
