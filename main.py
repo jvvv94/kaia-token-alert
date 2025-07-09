@@ -3,20 +3,24 @@ import asyncio
 import os
 from telegram import Bot
 
+# 환경 변수로부터 값 가져오기
 ADDRESS = os.getenv("ADDRESS")
 TOKEN_API_URL = f"https://api.kaiascan.io/api/v1/txs?address={ADDRESS}&limit=10"
-
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
 TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
 
-CHECK_INTERVAL = 600  # 초 단위 (10분)
+# 반복 주기 (초 단위)
+CHECK_INTERVAL = 600  # 10분
 
+# 봇 객체 초기화
 bot = Bot(token=TELEGRAM_TOKEN)
 seen_token_hashes = set()
 
 async def check_new_token_txs():
     try:
-        res = requests.get(TOKEN_API_URL)
+        print("[INFO] Checking new token txs...")  # Railway log 확인용
+        res = requests.get(TOKEN_API_URL, timeout=10)
+        res.raise_for_status()
         data = res.json()
         txs = data.get("data", [])
 
@@ -39,7 +43,7 @@ async def check_new_token_txs():
                 seen_token_hashes.add(tx_hash)
 
     except Exception as e:
-        print(f"[오류] {e}")
+        print(f"[ERROR] {e}")
 
 async def main_loop():
     while True:
@@ -47,4 +51,7 @@ async def main_loop():
         await asyncio.sleep(CHECK_INTERVAL)
 
 if __name__ == "__main__":
-    asyncio.run(main_loop())
+    try:
+        asyncio.run(main_loop())
+    except KeyboardInterrupt:
+        print("[STOP] Bot manually stopped.")
