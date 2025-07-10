@@ -32,7 +32,7 @@ async def check_new_token_txs():
             res = requests.get(url, headers=headers)
             res.raise_for_status()
             data = res.json()
-            txs = data.get("items", [])
+            txs = data.get("results", [])  # ← 수정됨
 
             for tx in txs:
                 tx_hash = tx.get("txHash")
@@ -40,7 +40,7 @@ async def check_new_token_txs():
                 from_addr = tx.get("from", "").lower()
                 symbol = tx.get("symbol")
                 decimals = int(tx.get("decimals", 18))
-                amount = int(tx.get("amount", 0)) / (10 ** decimals)
+                amount = float(tx.get("amount", 0))  # ← 수정됨
 
                 # 중복 방지
                 if tx_hash in seen_token_hashes:
